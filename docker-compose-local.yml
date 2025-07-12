@@ -1,0 +1,18 @@
+services:
+  johnny-payment:
+    hostname: johnny-payment
+    build:
+      context: ./
+      dockerfile: Dockerfile.local
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    volumes:
+      - .:/app
+
+networks:
+  backend:
+    driver: bridge
+  payment-processor:
+    external: true

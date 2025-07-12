@@ -1,0 +1,7 @@
+FROM amazoncorretto:24-alpine-jdk
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
+WORKDIR /app
+COPY . /app
+RUN ./mvnw dependency:go-offline
+CMD ["./mvnw", "spring-boot:run"]
