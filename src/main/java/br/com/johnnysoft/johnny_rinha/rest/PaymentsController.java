@@ -10,4 +10,9 @@ public class PaymentsController {
     public String helloWorld() {
         return "Hello World";
     }
+
+    @GetMapping("/Lucas")
+    public String helloLucas() {
+        return "Hello";
+    }
 }
