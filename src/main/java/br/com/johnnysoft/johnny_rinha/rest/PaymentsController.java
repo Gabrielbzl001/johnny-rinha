@@ -15,4 +15,8 @@ public class PaymentsController {
     public String helloLucas() {
         return "Hello";
     }
+    @GetMapping("/payments-sammary")
+    public String paymens() {
+        return "Hello Payments";
+    }
 }
