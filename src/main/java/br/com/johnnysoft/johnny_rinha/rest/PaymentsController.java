@@ -10,4 +10,8 @@ public class PaymentsController {
     public String helloWorld() {
         return "Hello World";
     }
+    @GetMapping("/payments-sammary")
+    public String paymens() {
+        return "Hello Payments";
+    }
 }
