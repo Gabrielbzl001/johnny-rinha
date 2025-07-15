@@ -10,11 +10,6 @@ public class PaymentsController {
     public String helloWorld() {
         return "Hello World";
     }
-
-    @GetMapping("/Lucas")
-    public String helloLucas() {
-        return "Hello";
-    }
     @GetMapping("/payments-sammary")
     public String paymens() {
         return "Hello Payments";
