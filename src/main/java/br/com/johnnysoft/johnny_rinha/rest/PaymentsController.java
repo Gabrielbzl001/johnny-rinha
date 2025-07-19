@@ -34,8 +34,16 @@ public class PaymentsController {
         return redisService.getSummary(from, to);
     }
 
+    @GetMapping("/payments-between")
+    public String findPaymentsBetween(
+            @RequestParam Instant start,
+            @RequestParam Instant end) {
+        return this.redisService.findPaymentsBetween(start, end);
+    }
+
     @PostMapping("/payments")
     public String payments(@RequestBody Payment payment) {
         return this.paymentsService.sendPayment(payment);
     }
+
 }
