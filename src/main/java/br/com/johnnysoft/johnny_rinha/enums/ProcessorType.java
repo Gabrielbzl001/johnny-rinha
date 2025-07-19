@@ -1,6 +1,16 @@
 package br.com.johnnysoft.johnny_rinha.enums;
 
-public record ProcessorType(String value) {
-    public static final ProcessorType DEFAULT = new ProcessorType("default");
-    public static final ProcessorType FALLBACK = new ProcessorType("fallback");
+public enum ProcessorType {
+    DEFAULT("default"),
+    FALLBACK("fallback");
+
+    private final String value;
+
+    ProcessorType(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

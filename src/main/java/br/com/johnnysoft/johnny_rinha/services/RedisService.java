@@ -30,8 +30,8 @@ public class RedisService {
         double score = payment.requestedAt().atZone(ZoneId.systemDefault()).toEpochSecond();
         ZSetOperations<String, Payment> zset = redisTemplate.opsForZSet();
 
-        zset.add(type.value(), payment, score);
-        redisTemplate.opsForValue().set(type.value() + ":" + payment.correlationId().toString(), payment);
+        zset.add(type.getValue(), payment, score);
+        redisTemplate.opsForValue().set(type.getValue() + ":" + payment.correlationId().toString(), payment);
     }
 
     public Set<Payment> findPaymentsBetween(Instant start, Instant end, ProcessorType type) {
@@ -39,7 +39,7 @@ public class RedisService {
         double maxScore = end.atZone(ZoneId.systemDefault()).toEpochSecond();
 
         return redisTemplate.opsForZSet()
-                .rangeByScore(type.value(), minScore, maxScore);
+                .rangeByScore(type.getValue(), minScore, maxScore);
     }
 
     public String find(String key) {
