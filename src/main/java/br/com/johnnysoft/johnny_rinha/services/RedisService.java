@@ -5,7 +5,6 @@ import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -23,11 +22,15 @@ public class RedisService {
     }
 
     public void save(Payment payment) {
+        save(payment, "default");
+    }
+
+    public void save(Payment payment, String type) {
         double score = payment.requestedAt().atZone(ZoneId.systemDefault()).toEpochSecond();
         ZSetOperations<String, Payment> zset = redisTemplate.opsForZSet();
 
-        zset.add("payment", payment, score);
-        redisTemplate.opsForValue().set("payment:" + payment.correlationId().toString(), payment);
+        zset.add(type, payment, score);
+        redisTemplate.opsForValue().set(type + ":" + payment.correlationId().toString(), payment);
     }
 
     public String find(String key) {
@@ -35,27 +38,35 @@ public class RedisService {
         return value != null ? value.toString() : null;
     }
 
-    public Set<Payment> findPaymentsBetween(Instant start, Instant end) {
+    public Set<Payment> findPaymentsBetween(Instant start, Instant end, String type) {
         double minScore = start.atZone(ZoneId.systemDefault()).toEpochSecond();
         double maxScore = end.atZone(ZoneId.systemDefault()).toEpochSecond();
 
         return redisTemplate.opsForZSet()
-                .rangeByScore("payment", minScore, maxScore);
+                .rangeByScore(type, minScore, maxScore);
     }
 
     public Map<String, Object> getSummary(Instant from, Instant to) {
-        HashMap<String, Object> summary = new HashMap<>();
-        double totalAmount = 0.0;
-        Set<Payment> payments = findPaymentsBetween(from, to);
-
-        for (Payment payment : payments) {
-            totalAmount += payment.amount();
-            System.out.println("Processing key: " + payment);
-        }
-
-        summary.put("total_payments", payments.size());
-        summary.put("total_amount", totalAmount);
-        return summary;
-    }
+    Map<String, Object> response = new HashMap<>();
+    
+    Map<String, Object> defaultData = new HashMap<>();
+    Set<Payment> defaultPayments = findPaymentsBetween(from, to, "default");
+    double defaultTotal = defaultPayments.stream().mapToDouble(Payment::amount).sum();
+    
+    defaultData.put("totalRequests", defaultPayments.size());
+    defaultData.put("totalAmount", defaultTotal);
+    
+    Map<String, Object> fallbackData = new HashMap<>();
+    Set<Payment> fallbackPayments = findPaymentsBetween(from, to, "fallback");
+    double fallbackTotal = fallbackPayments.stream().mapToDouble(Payment::amount).sum();
+    
+    fallbackData.put("totalRequests", fallbackPayments.size());
+    fallbackData.put("totalAmount", fallbackTotal);
+    
+    response.put("default", defaultData);
+    response.put("fallback", fallbackData);
+    
+    return response;
+}
 }
 

@@ -39,7 +39,7 @@ public class PaymentsController {
     public Set<Payment> findPaymentsBetween(
             @RequestParam Instant start,
             @RequestParam Instant end) {
-        return this.redisService.findPaymentsBetween(start, end);
+        return this.redisService.findPaymentsBetween(start, end, "default");
     }
 
     @PostMapping("/payments")
