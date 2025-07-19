@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +13,11 @@ import br.com.johnnysoft.johnny_rinha.models.Payment;
 @Service
 public class RedisService {
 
-    @Autowired
     private RedisTemplate<UUID, Payment> redisTemplate;
+
+    public RedisService(RedisTemplate<UUID, Payment> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     public void save(Payment payment) {
         redisTemplate.opsForValue().set(payment.correlationId(), payment);
@@ -36,3 +38,4 @@ public class RedisService {
         return summary;
     }
 }
+
