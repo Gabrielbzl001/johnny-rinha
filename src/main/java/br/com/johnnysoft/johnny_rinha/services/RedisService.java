@@ -13,14 +13,14 @@ import br.com.johnnysoft.johnny_rinha.models.Payment;
 @Service
 public class RedisService {
 
-    private RedisTemplate<UUID, Payment> redisTemplate;
+    private final RedisTemplate<String, Payment> redisTemplate;
 
-    public RedisService(RedisTemplate<UUID, Payment> redisTemplate) {
+    public RedisService(RedisTemplate<String, Payment> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
     public void save(Payment payment) {
-        redisTemplate.opsForValue().set(payment.correlationId(), payment);
+        redisTemplate.opsForValue().set(payment.correlationId().toString(), payment);
     }
 
     public String find(String key) {

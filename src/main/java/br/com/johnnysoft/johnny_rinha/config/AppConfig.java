@@ -16,8 +16,8 @@ public class AppConfig {
     }
 
     @Bean
-    public RedisTemplate<UUID, Payment> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<UUID, Payment> template = new RedisTemplate<>();
+    public RedisTemplate<String, Payment> redisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Payment> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
         return template;
