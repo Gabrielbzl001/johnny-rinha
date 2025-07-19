@@ -16,18 +16,8 @@ public class RedisController {
         this.redisService = redisService;
     }
 
-    @PostMapping("/{key}")
-    public void save(@PathVariable String key, @RequestBody String value) {
-        redisService.save(key, value);
-    }
-
     @GetMapping("/{key}")
     public String buscar(@PathVariable String key) {
         return redisService.find(key);
-    }
-
-    @DeleteMapping("/{key}")
-    public void delete(@PathVariable String key) {
-        redisService.delete(key);
     }
 }

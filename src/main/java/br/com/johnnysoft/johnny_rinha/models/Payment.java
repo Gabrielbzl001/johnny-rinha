@@ -4,5 +4,5 @@ import java.time.Instant;
 import java.util.UUID;
 
 
-public record Payment(UUID id, float amount, Instant createdAt) {
+public record Payment(UUID correlationId, float amount, Instant requestedAt) {
 }
