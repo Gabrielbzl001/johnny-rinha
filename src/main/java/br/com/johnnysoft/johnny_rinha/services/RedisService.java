@@ -22,10 +22,6 @@ public class RedisService {
         this.redisTemplate = redisTemplate;
     }
 
-    public void save(Payment payment) {
-        save(payment, ProcessorType.FALLBACK);
-    }
-
     public void save(Payment payment, ProcessorType type) {
         double score = payment.requestedAt().atZone(ZoneId.systemDefault()).toEpochSecond();
         ZSetOperations<String, Payment> zset = redisTemplate.opsForZSet();
@@ -48,26 +44,25 @@ public class RedisService {
     }
 
     public Map<String, Object> getSummary(Instant from, Instant to) {
-    Map<String, Object> response = new HashMap<>();
-    
-    Map<String, Object> defaultData = new HashMap<>();
-    Set<Payment> defaultPayments = findPaymentsBetween(from, to, ProcessorType.DEFAULT);
-    double defaultTotal = defaultPayments.stream().mapToDouble(Payment::amount).sum();
-    
-    defaultData.put("totalRequests", defaultPayments.size());
-    defaultData.put("totalAmount", defaultTotal);
-    
-    Map<String, Object> fallbackData = new HashMap<>();
-    Set<Payment> fallbackPayments = findPaymentsBetween(from, to, ProcessorType.FALLBACK);
-    double fallbackTotal = fallbackPayments.stream().mapToDouble(Payment::amount).sum();
-    
-    fallbackData.put("totalRequests", fallbackPayments.size());
-    fallbackData.put("totalAmount", fallbackTotal);
-    
-    response.put("default", defaultData);
-    response.put("fallback", fallbackData);
-    
-    return response;
-}
-}
+        Map<String, Object> response = new HashMap<>();
 
+        Map<String, Object> defaultData = new HashMap<>();
+        Set<Payment> defaultPayments = findPaymentsBetween(from, to, ProcessorType.DEFAULT);
+        double defaultTotal = defaultPayments.stream().mapToDouble(Payment::amount).sum();
+
+        defaultData.put("totalRequests", defaultPayments.size());
+        defaultData.put("totalAmount", defaultTotal);
+
+        Map<String, Object> fallbackData = new HashMap<>();
+        Set<Payment> fallbackPayments = findPaymentsBetween(from, to, ProcessorType.FALLBACK);
+        double fallbackTotal = fallbackPayments.stream().mapToDouble(Payment::amount).sum();
+
+        fallbackData.put("totalRequests", fallbackPayments.size());
+        fallbackData.put("totalAmount", fallbackTotal);
+
+        response.put("default", defaultData);
+        response.put("fallback", fallbackData);
+
+        return response;
+    }
+}

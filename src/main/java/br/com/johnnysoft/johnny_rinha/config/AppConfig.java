@@ -1,6 +1,5 @@
 package br.com.johnnysoft.johnny_rinha.config;
 
-import java.util.UUID;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
