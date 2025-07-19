@@ -11,6 +11,20 @@ services:
       - payment-processor
     volumes:
       - .:/app
+    depends_on:
+      johnny-redis:
+        condition: service_healthy
+
+  johnny-redis:
+    hostname: johnny-redis
+    image: redis:8.0.3-alpine
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   backend:
