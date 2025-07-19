@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,30 +35,25 @@ public class RedisService {
         return value != null ? value.toString() : null;
     }
 
-    public String findPaymentsBetween(Instant start, Instant end) {
+    public Set<Payment> findPaymentsBetween(Instant start, Instant end) {
         double minScore = start.atZone(ZoneId.systemDefault()).toEpochSecond();
         double maxScore = end.atZone(ZoneId.systemDefault()).toEpochSecond();
 
         return redisTemplate.opsForZSet()
-                .rangeByScore("payment", minScore, maxScore).toString();
+                .rangeByScore("payment", minScore, maxScore);
     }
 
     public Map<String, Object> getSummary(Instant from, Instant to) {
         HashMap<String, Object> summary = new HashMap<>();
-        int totalPayments = 0;
         double totalAmount = 0.0;
-        
-        for (String key : redisTemplate.keys("*")) {
-            Payment payment = redisTemplate.opsForValue().get(key);
-            if (payment != null && payment.requestedAt().isAfter(from) && payment.requestedAt().isBefore(to)) {
-                totalPayments++;
-                totalAmount += payment.amount();
-                System.out.println("Payment found: " + payment);
-            }
-            System.out.println("Processing key: " + key);
+        Set<Payment> payments = findPaymentsBetween(from, to);
+
+        for (Payment payment : payments) {
+            totalAmount += payment.amount();
+            System.out.println("Processing key: " + payment);
         }
 
-        summary.put("total_payments", totalPayments);
+        summary.put("total_payments", payments.size());
         summary.put("total_amount", totalAmount);
         return summary;
     }

@@ -2,6 +2,7 @@ package br.com.johnnysoft.johnny_rinha.rest;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,7 +36,7 @@ public class PaymentsController {
     }
 
     @GetMapping("/payments-between")
-    public String findPaymentsBetween(
+    public Set<Payment> findPaymentsBetween(
             @RequestParam Instant start,
             @RequestParam Instant end) {
         return this.redisService.findPaymentsBetween(start, end);
