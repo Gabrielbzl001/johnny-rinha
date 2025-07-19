@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import br.com.johnnysoft.johnny_rinha.enums.ProcessorType;
 import br.com.johnnysoft.johnny_rinha.models.Payment;
 import br.com.johnnysoft.johnny_rinha.services.PaymentsService;
 import br.com.johnnysoft.johnny_rinha.services.RedisService;
@@ -39,7 +41,7 @@ public class PaymentsController {
     public Set<Payment> findPaymentsBetween(
             @RequestParam Instant start,
             @RequestParam Instant end) {
-        return this.redisService.findPaymentsBetween(start, end, "default");
+        return this.redisService.findPaymentsBetween(start, end, ProcessorType.DEFAULT);
     }
 
     @PostMapping("/payments")

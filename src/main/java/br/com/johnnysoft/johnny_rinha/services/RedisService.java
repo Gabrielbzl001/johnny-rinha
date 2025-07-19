@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
+import br.com.johnnysoft.johnny_rinha.enums.ProcessorType;
 import br.com.johnnysoft.johnny_rinha.models.Payment;
 
 @Service
@@ -22,15 +23,23 @@ public class RedisService {
     }
 
     public void save(Payment payment) {
-        save(payment, "default");
+        save(payment, ProcessorType.DEFAULT);
     }
 
-    public void save(Payment payment, String type) {
+    public void save(Payment payment, ProcessorType type) {
         double score = payment.requestedAt().atZone(ZoneId.systemDefault()).toEpochSecond();
         ZSetOperations<String, Payment> zset = redisTemplate.opsForZSet();
 
-        zset.add(type, payment, score);
-        redisTemplate.opsForValue().set(type + ":" + payment.correlationId().toString(), payment);
+        zset.add(type.value(), payment, score);
+        redisTemplate.opsForValue().set(type.value() + ":" + payment.correlationId().toString(), payment);
+    }
+
+    public Set<Payment> findPaymentsBetween(Instant start, Instant end, ProcessorType type) {
+        double minScore = start.atZone(ZoneId.systemDefault()).toEpochSecond();
+        double maxScore = end.atZone(ZoneId.systemDefault()).toEpochSecond();
+
+        return redisTemplate.opsForZSet()
+                .rangeByScore(type.value(), minScore, maxScore);
     }
 
     public String find(String key) {
@@ -38,26 +47,18 @@ public class RedisService {
         return value != null ? value.toString() : null;
     }
 
-    public Set<Payment> findPaymentsBetween(Instant start, Instant end, String type) {
-        double minScore = start.atZone(ZoneId.systemDefault()).toEpochSecond();
-        double maxScore = end.atZone(ZoneId.systemDefault()).toEpochSecond();
-
-        return redisTemplate.opsForZSet()
-                .rangeByScore(type, minScore, maxScore);
-    }
-
     public Map<String, Object> getSummary(Instant from, Instant to) {
     Map<String, Object> response = new HashMap<>();
     
     Map<String, Object> defaultData = new HashMap<>();
-    Set<Payment> defaultPayments = findPaymentsBetween(from, to, "default");
+    Set<Payment> defaultPayments = findPaymentsBetween(from, to, ProcessorType.DEFAULT);
     double defaultTotal = defaultPayments.stream().mapToDouble(Payment::amount).sum();
     
     defaultData.put("totalRequests", defaultPayments.size());
     defaultData.put("totalAmount", defaultTotal);
     
     Map<String, Object> fallbackData = new HashMap<>();
-    Set<Payment> fallbackPayments = findPaymentsBetween(from, to, "fallback");
+    Set<Payment> fallbackPayments = findPaymentsBetween(from, to, ProcessorType.FALLBACK);
     double fallbackTotal = fallbackPayments.stream().mapToDouble(Payment::amount).sum();
     
     fallbackData.put("totalRequests", fallbackPayments.size());
