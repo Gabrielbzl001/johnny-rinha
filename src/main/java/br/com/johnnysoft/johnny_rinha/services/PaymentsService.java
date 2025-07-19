@@ -17,7 +17,7 @@ public class PaymentsService {
     }
 
     public String sendPayment(Payment payment) {
-        String url = "http://payment-processor-default:8080/payments";
+        String url = "http://payment-processor-fallback:8080/payments";
         this.redisService.save(payment);
         return restTemplate.postForObject(url, payment, String.class);
     }

@@ -23,7 +23,7 @@ public class RedisService {
     }
 
     public void save(Payment payment) {
-        save(payment, ProcessorType.DEFAULT);
+        save(payment, ProcessorType.FALLBACK);
     }
 
     public void save(Payment payment, ProcessorType type) {
