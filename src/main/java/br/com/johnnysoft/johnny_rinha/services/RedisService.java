@@ -32,6 +32,16 @@ public class RedisService {
         HashMap<String, Object> summary = new HashMap<>();
         int totalPayments = 0;
         double totalAmount = 0.0;
+        
+        for (String key : redisTemplate.keys("*")) {
+            Payment payment = redisTemplate.opsForValue().get(key);
+            if (payment != null && payment.requestedAt().isAfter(from) && payment.requestedAt().isBefore(to)) {
+                totalPayments++;
+                totalAmount += payment.amount();
+                System.out.println("Payment found: " + payment);
+            }
+            System.out.println("Processing key: " + key);
+        }
 
         summary.put("total_payments", totalPayments);
         summary.put("total_amount", totalAmount);
