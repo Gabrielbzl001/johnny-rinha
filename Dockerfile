@@ -1,4 +1,4 @@
-FROM amazoncorretto:24-alpine-jdk
+FROM eclipse-temurin:24-jdk-alpine
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 ARG JAR_FILE=target/*.jar
