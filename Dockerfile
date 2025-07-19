@@ -1,6 +1,4 @@
 FROM eclipse-temurin:24-jdk-alpine
-RUN addgroup -S spring && adduser -S spring -G spring
-USER spring:spring
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} app.jar
+WORKDIR /app
+COPY target/*.jar app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]

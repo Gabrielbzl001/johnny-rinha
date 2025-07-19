@@ -11,6 +11,7 @@ services:
       - payment-processor
     volumes:
       - .:/app
+      - ~/.m2:/root/.m2
     depends_on:
       johnny-redis:
         condition: service_healthy
