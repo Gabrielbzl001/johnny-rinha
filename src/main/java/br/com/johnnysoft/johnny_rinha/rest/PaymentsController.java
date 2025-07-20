@@ -49,4 +49,10 @@ public class PaymentsController {
         return this.paymentsService.sendPayment(payment);
     }
 
+    @PostMapping("/purge-payments")
+    public String purgePayments() {
+        this.redisService.purgePayments();
+        return "ok";
+    }
+
 }

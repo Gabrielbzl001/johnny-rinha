@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 import br.com.johnnysoft.johnny_rinha.models.Payment;
+import br.com.johnnysoft.johnny_rinha.models.ServiceHealthResponse;
+
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -15,6 +17,13 @@ public class AppConfig {
     }
 
     @Bean
+    public RedisTemplate<String, ServiceHealthResponse> healthRedisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, ServiceHealthResponse> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        return template;
+    }
+
+    @Bean
     public RedisTemplate<String, Payment> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Payment> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
@@ -22,4 +31,3 @@ public class AppConfig {
         return template;
     }
 }
-

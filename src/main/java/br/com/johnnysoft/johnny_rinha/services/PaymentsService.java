@@ -54,11 +54,11 @@ public class PaymentsService {
     }
 
     public String sendPayment(Payment payment) {
-        boolean isDefaultAvailable = isServiceAvailable(ProcessorType.DEFAULT);
+        boolean chooseDefault = chooseDefault();
         String url = "http://payment-processor-default:8080/payments";
         ProcessorType type = ProcessorType.DEFAULT;
 
-        if (!isDefaultAvailable) {
+        if (!chooseDefault) {
             url = "http://payment-processor-fallback:8080/payments";
             type = ProcessorType.FALLBACK;
         }

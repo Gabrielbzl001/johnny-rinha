@@ -53,6 +53,10 @@ public class RedisService {
         return value != null ? value.toString() : null;
     }
 
+    public void purgePayments() {
+        redisTemplate.getConnectionFactory().getConnection().serverCommands().flushAll();
+    }
+
     public Map<String, Object> getSummary(Instant from, Instant to) {
         Map<String, Object> response = new HashMap<>();
 

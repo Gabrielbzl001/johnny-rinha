@@ -1,11 +1,4 @@
 FROM eclipse-temurin:24-jdk-alpine
 WORKDIR /app
 RUN apk add --no-cache bash
-COPY pom.xml .
-COPY .mvn/ .mvn/
-COPY mvnw .
-RUN ./mvnw dependency:go-offline
-COPY src ./src
-
-# Comando com hot-reload
 CMD ["./mvnw", "spring-boot:run", "-Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000'"]
