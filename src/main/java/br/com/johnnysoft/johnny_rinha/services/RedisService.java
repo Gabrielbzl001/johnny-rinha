@@ -1,5 +1,6 @@
 package br.com.johnnysoft.johnny_rinha.services;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.HashMap;
@@ -12,14 +13,23 @@ import org.springframework.stereotype.Service;
 
 import br.com.johnnysoft.johnny_rinha.enums.ProcessorType;
 import br.com.johnnysoft.johnny_rinha.models.Payment;
+import br.com.johnnysoft.johnny_rinha.models.ServiceHealthResponse;
 
 @Service
 public class RedisService {
 
     private final RedisTemplate<String, Payment> redisTemplate;
+    private final RedisTemplate<String, ServiceHealthResponse> healthRedisTemplate;
 
-    public RedisService(RedisTemplate<String, Payment> redisTemplate) {
+    public RedisService(RedisTemplate<String, Payment> redisTemplate,
+            RedisTemplate<String, ServiceHealthResponse> healthRedisTemplate) {
         this.redisTemplate = redisTemplate;
+        this.healthRedisTemplate = healthRedisTemplate;
+    }
+
+    public void updateHealth(String key, boolean failing, int minResponseTime) {
+        healthRedisTemplate.opsForValue().set(key, new ServiceHealthResponse(failing, minResponseTime),
+                Duration.ofSeconds(5));
     }
 
     public void save(Payment payment, ProcessorType type) {

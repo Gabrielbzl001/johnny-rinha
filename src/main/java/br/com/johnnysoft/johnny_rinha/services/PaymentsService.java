@@ -1,11 +1,14 @@
 package br.com.johnnysoft.johnny_rinha.services;
 
+import java.util.concurrent.Flow.Processor;
+
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import br.com.johnnysoft.johnny_rinha.enums.ProcessorType;
 import br.com.johnnysoft.johnny_rinha.models.Payment;
+import br.com.johnnysoft.johnny_rinha.models.ServiceHealthResponse;
 
 @Service
 public class PaymentsService {
@@ -18,8 +21,40 @@ public class PaymentsService {
         this.redisService = redisService;
     }
 
+    public boolean chooseDefault() {
+
+        // verificar se o dafault está disponível
+
+        // se sim, verificar se o minResponseTime está alto(definir estratégia)
+
+        //// se for alto, verificar se o fallback está disponível
+
+        //// se não estiver disponível, true
+
+        // se fallback estiver disponível, verificar se o minResponseTime do fallback
+        // está mais alto que do default
+
+        // se sim, true
+
+        // se não, false
+        return true;
+    }
+
+    public boolean isServiceAvailable(ProcessorType type) {
+        String failing = redisService.find("failing:" + type.getValue());
+        if (failing == null) {
+            ServiceHealthResponse response = restTemplate.getForEntity(
+                    "http://payment-processor-" + type.getValue() + ":8080/payments/service-health",
+                    ServiceHealthResponse.class)
+                    .getBody();
+            redisService.updateHealth("failing:" + type.getValue(), response.failing(), response.minResponseTime());
+            return response.failing();
+        }
+        return failing.contains("true");
+    }
+
     public String sendPayment(Payment payment) {
-        boolean isDefaultAvailable = true;
+        boolean isDefaultAvailable = isServiceAvailable(ProcessorType.DEFAULT);
         String url = "http://payment-processor-default:8080/payments";
         ProcessorType type = ProcessorType.DEFAULT;
 
