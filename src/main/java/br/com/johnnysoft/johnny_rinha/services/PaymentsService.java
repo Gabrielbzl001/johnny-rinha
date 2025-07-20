@@ -37,7 +37,7 @@ public class PaymentsService {
         // se sim, true
 
         // se não, false
-        return true;
+        return false;
     }
 
     public boolean isServiceAvailable(ProcessorType type) {

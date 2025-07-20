@@ -10,4 +10,11 @@ Para iniciar os containers, execute o seguinte comando:
 docker compose -f docker-compose-local.yml up --build -d
 ```
 
-O serviço de backend estará acessível na porta 8080.
+O serviço de backend estará acessível na porta 9999.
+
+# TODO
+
+[] configurar load balancer(nginx)
+[] configurar limits cpu e memória
+[] implementar verificação service-health(chooseDefault)
+[] implementar fila de processamento(provavelmente no redis mesmo)

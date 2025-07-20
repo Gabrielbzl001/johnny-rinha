@@ -5,7 +5,7 @@ services:
       context: ./
       dockerfile: Dockerfile.local
     ports:
-      - "8080:8080"
+      - "9999:8080"
     networks:
       - backend
       - payment-processor
@@ -22,7 +22,7 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
