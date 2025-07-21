@@ -32,14 +32,19 @@ public class PaymentsController {
     }
 
     @GetMapping("/payments-summary")
-    public Map<String, Object> paymentsSummary(@RequestParam("from") Instant from,
-            @RequestParam("to") Instant to) {
+    public Map<String, Object> paymentsSummary(
+            @RequestParam(value = "from", required = false) Instant from,
+            @RequestParam(value = "to", required = false) Instant to) {
+
+        if (from == null || to == null) {
+            return redisService.getSummary(Instant.parse("1980-01-01T00:00:00Z"), Instant.now());
+        }
+
         return redisService.getSummary(from, to);
     }
 
     @GetMapping("/payments-between")
-    public Set<Payment> findPaymentsBetween(
-            @RequestParam Instant start,
+    public Set<Payment> findPaymentsBetween(@RequestParam Instant start,
             @RequestParam Instant end) {
         return this.redisService.findPaymentsBetween(start, end, ProcessorType.DEFAULT);
     }

@@ -18,4 +18,4 @@ O serviço de backend estará acessível na porta 9999.
 - [ ] configurar limits cpu e memória
 - [ ] implementar verificação service-health(chooseDefault)
 - [ ] implementar fila de processamento(provavelmente no redis mesmo)
-- [ ] tornar os parâmetros `from` e `get` do endpoint `GET /payments-summary` opcionais
+- [x] tornar os parâmetros `from` e `get` do endpoint `GET /payments-summary` opcionais

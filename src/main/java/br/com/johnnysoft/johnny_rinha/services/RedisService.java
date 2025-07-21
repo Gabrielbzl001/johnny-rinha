@@ -28,8 +28,8 @@ public class RedisService {
     }
 
     public void updateHealth(String key, boolean failing, int minResponseTime) {
-        healthRedisTemplate.opsForValue().set(key, new ServiceHealthResponse(failing, minResponseTime),
-                Duration.ofSeconds(5));
+        healthRedisTemplate.opsForValue().set(key,
+                new ServiceHealthResponse(failing, minResponseTime), Duration.ofSeconds(5));
     }
 
     public void save(Payment payment, ProcessorType type) {
@@ -37,15 +37,15 @@ public class RedisService {
         ZSetOperations<String, Payment> zset = redisTemplate.opsForZSet();
 
         zset.add(type.getValue(), payment, score);
-        redisTemplate.opsForValue().set(type.getValue() + ":" + payment.correlationId().toString(), payment);
+        redisTemplate.opsForValue().set(type.getValue() + ":" + payment.correlationId().toString(),
+                payment);
     }
 
     public Set<Payment> findPaymentsBetween(Instant start, Instant end, ProcessorType type) {
         double minScore = start.atZone(ZoneId.systemDefault()).toEpochSecond();
         double maxScore = end.atZone(ZoneId.systemDefault()).toEpochSecond();
 
-        return redisTemplate.opsForZSet()
-                .rangeByScore(type.getValue(), minScore, maxScore);
+        return redisTemplate.opsForZSet().rangeByScore(type.getValue(), minScore, maxScore);
     }
 
     public String find(String key) {
