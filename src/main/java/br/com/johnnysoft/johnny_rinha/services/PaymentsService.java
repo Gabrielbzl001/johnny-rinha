@@ -22,35 +22,42 @@ public class PaymentsService {
     }
 
     public boolean chooseDefault() {
+        ServiceHealthResponse serviceHealthDefault = getServiceHealth(ProcessorType.DEFAULT);
+        ServiceHealthResponse serviceHealthFallback = getServiceHealth(ProcessorType.FALLBACK);
 
-        // verificar se o dafault está disponível
+        // verificar se o default está disponível
+        if (!serviceHealthDefault.failing()) {
 
-        // se sim, verificar se o minResponseTime está alto(definir estratégia)
+            // se sim, verificar se o minResponseTime está alto(definir estratégia)
+            if (serviceHealthDefault.minResponseTime() > 200) {
 
-        //// se for alto, verificar se o fallback está disponível
+                //// se for alto, verificar se o fallback está disponível
+                if (!serviceHealthFallback.failing() && serviceHealthFallback
+                        .minResponseTime() < serviceHealthDefault.minResponseTime()) {
+                    return false;
+                }
 
-        //// se não estiver disponível, true
+                //// se não estiver disponível, true
+                return true;
+            }
 
-        // se fallback estiver disponível, verificar se o minResponseTime do fallback
-        // está mais alto que do default
+            return true;
+        }
 
-        // se sim, true
-
-        // se não, false
         return false;
     }
 
-    public boolean isServiceAvailable(ProcessorType type) {
-        String failing = redisService.find("failing:" + type.getValue());
-        if (failing == null) {
-            ServiceHealthResponse response = restTemplate.getForEntity(
-                    "http://payment-processor-" + type.getValue() + ":8080/payments/service-health",
-                    ServiceHealthResponse.class)
+    public ServiceHealthResponse getServiceHealth(ProcessorType type) {
+        ServiceHealthResponse serviceHealth = redisService.findServiceHealth(type);
+        if (serviceHealth == null) {
+            ServiceHealthResponse response = restTemplate
+                    .getForEntity("http://payment-processor-" + type.getValue()
+                            + ":8080/payments/service-health", ServiceHealthResponse.class)
                     .getBody();
-            redisService.updateHealth("failing:" + type.getValue(), response.failing(), response.minResponseTime());
-            return response.failing();
+            redisService.updateHealth("service-health:" + type.getValue(), response);
+            return response;
         }
-        return failing.contains("true");
+        return serviceHealth;
     }
 
     public String sendPayment(Payment payment) {
@@ -63,7 +70,8 @@ public class PaymentsService {
             type = ProcessorType.FALLBACK;
         }
 
-        HttpStatusCode statusCode = restTemplate.postForEntity(url, payment, String.class).getStatusCode();
+        HttpStatusCode statusCode =
+                restTemplate.postForEntity(url, payment, String.class).getStatusCode();
         if (statusCode.is2xxSuccessful()) {
             this.redisService.save(payment, type);
             return "OK";

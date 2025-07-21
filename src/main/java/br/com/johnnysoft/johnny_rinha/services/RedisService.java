@@ -27,9 +27,8 @@ public class RedisService {
         this.healthRedisTemplate = healthRedisTemplate;
     }
 
-    public void updateHealth(String key, boolean failing, int minResponseTime) {
-        healthRedisTemplate.opsForValue().set(key,
-                new ServiceHealthResponse(failing, minResponseTime), Duration.ofSeconds(5));
+    public void updateHealth(String key, ServiceHealthResponse serviceHealth) {
+        healthRedisTemplate.opsForValue().set(key, serviceHealth, Duration.ofSeconds(5));
     }
 
     public void save(Payment payment, ProcessorType type) {
@@ -51,6 +50,10 @@ public class RedisService {
     public String find(String key) {
         Object value = redisTemplate.opsForValue().get(key);
         return value != null ? value.toString() : null;
+    }
+
+    public ServiceHealthResponse findServiceHealth(ProcessorType type) {
+        return healthRedisTemplate.opsForValue().get("service-health:" + type.getValue());
     }
 
     public void purgePayments() {
