@@ -11,6 +11,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import br.com.johnnysoft.johnny_rinha.models.Payment;
 import br.com.johnnysoft.johnny_rinha.models.Receiver;
 import br.com.johnnysoft.johnny_rinha.models.ServiceHealthResponse;
+import br.com.johnnysoft.johnny_rinha.services.PaymentsService;
 
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -70,8 +71,8 @@ public class AppConfig {
     }
 
     @Bean
-    Receiver receiver() {
-        return new Receiver();
+    Receiver receiver(ObjectMapper objectMapper, PaymentsService paymentsService) {
+        return new Receiver(objectMapper, paymentsService);
     }
 
     @Bean

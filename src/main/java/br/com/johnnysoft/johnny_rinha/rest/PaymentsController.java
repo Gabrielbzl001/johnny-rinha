@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,12 +19,12 @@ import br.com.johnnysoft.johnny_rinha.services.RedisService;
 @RestController
 public class PaymentsController {
     private final RedisService redisService;
+    private final RedisTemplate<String, Payment> redisTemplate;
 
-    private final PaymentsService paymentsService;
-
-    public PaymentsController(PaymentsService paymentsService, RedisService redisService) {
-        this.paymentsService = paymentsService;
+    public PaymentsController(RedisService redisService,
+            RedisTemplate<String, Payment> redisTemplate) {
         this.redisService = redisService;
+        this.redisTemplate = redisTemplate;
     }
 
     @GetMapping("/")
@@ -51,7 +52,8 @@ public class PaymentsController {
 
     @PostMapping("/payments")
     public String payments(@RequestBody Payment payment) {
-        return this.paymentsService.sendPayment(payment);
+        redisTemplate.convertAndSend("chat", payment);
+        return "ok";
     }
 
     @PostMapping("/purge-payments")
